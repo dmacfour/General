@@ -52,6 +52,9 @@ for (name in dist_names) {
   state_dupe <- c(state_dupe,unique(df_dupes[df_dupes$District == name,]$State))
 }
 
+items[items == TRUE] <- 1
+items[items == FALSE] <- 0
+
 for (i in 1:length(date_range)) {  
   res <- items[items$Date > date_range[[i]][1] & items$Date <= date_range[[i]][2],]
   write.xlsx(res,
