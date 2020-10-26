@@ -8,7 +8,7 @@ df <- data.frame()
 
 for (states in state){
   
-  df <- rbind(df,read_excel("C:/Users/DavidMcCullough/One Drive - Marzano Research - Current/Marzano Research/MZR - Documents/Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/CE6.6.1 Data Entry_FINAL.xlsx", 
+  df <- rbind(df,read_excel("C:/Users/DavidMcCullough/Marzano Research/MZR - Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/CE6.6.1 Data Entry_FINAL.xlsx", 
              sheet = states)[,1:26])
 }
 
@@ -55,14 +55,4 @@ for (name in dist_names) {
 items[items == TRUE] <- 1
 items[items == FALSE] <- 0
 
-for (i in 1:length(date_range)) {  
-  res <- items[items$Date > date_range[[i]][1] & items$Date <= date_range[[i]][2],]
-  write.xlsx(res,
-             file = "C:/Users/DavidMcCullough/One Drive - Marzano Research - Current/Marzano Research/MZR - Documents/Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/Reliability_Output.xlsx",
-             append = TRUE, sheetName = paste(as.character(date_range[[i]][1])," - ",as.character(date_range[[i]][2])))
-  
-  by_item_reliability <- items %>% filter(Date > date_range[[i]][1] & Date <= date_range[[i]][2]) %>% summarise_if(is.logical,mean)
-  write.xlsx(by_item_reliability,
-             file = "C:/Users/DavidMcCullough/One Drive - Marzano Research - Current/Marzano Research/MZR - Documents/Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/Reliability_Output.xlsx",
-             append = TRUE, sheetName = paste("Reliability",as.character(date_range[[i]][1])," - ",as.character(date_range[[i]][2])))
-}
+write.csv(x = items,file = "C:/Users/DavidMcCullough/Marzano Research/MZR - Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/reliabilityround2.csv")
