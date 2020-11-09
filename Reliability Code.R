@@ -12,11 +12,6 @@ for (states in state){
              sheet = states)[,1:26])
 }
 
-#Two Week Date Ranges
-date_range <- list(c("2020-09-10","2020-10-07"),
-     c("2020-10-09","2020-10-23"),
-     c("2020-10-23","2020-11-06"),
-     c("2020-11-06","2020-11-20"))
 df_coded <- df[!is.na(df$`Date Coded`),]
 
 

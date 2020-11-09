@@ -1,0 +1,33 @@
+---
+title: "JiT Summary"
+output: word_document
+---
+
+```{r processing}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+state <- c("Kansas","Nebraska","Wyoming ", "North Dakota")
+
+df <- data.frame()
+
+for (states in state){
+  
+  df <- rbind(df,read_excel("C:/Users/DavidMcCullough/Marzano Research/MZR - Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/CE6.6.1 Data Entry_FINAL.xlsx", 
+             sheet = states)[,1:26])
+}
+
+df_coded <- df[!is.na(df$`Date Coded`),]
+
+vars <- names(df)
+
+```
+
+```{r}
+vars[5]
+temp <- df %>% filter(!is.na(get(vars[5]))) %>% group_by(State, get(vars[5])) %>% tally() %>% mutate(percent = (n/sum(n))*100)
+names(temp)[2] <- vars[5]
+
+ggplot(data = temp, aes(x=factor(get(vars[5])),y=percent,fill=factor(get(vars[5])))) + geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) + facet_grid(cols = vars(State)) + theme(axis.text.x = element_blank(),axis.title = element_blank(),plot.title = element_text(hjust = 0.5)) +labs(fill="Reponse") + ggtitle(vars[5])
+```
+
