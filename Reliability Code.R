@@ -2,7 +2,7 @@ library(readxl)
 library(dplyr)
 library(xlsx)
 
-state <- c("Kansas","Nebraska","Wyoming ")
+state <- c("Kansas","Nebraska","Wyoming ","North Dakota")
 
 df <- data.frame()
 
@@ -50,4 +50,4 @@ for (name in dist_names) {
 items[items == TRUE] <- 1
 items[items == FALSE] <- 0
 
-write.csv(x = items,file = "C:/Users/DavidMcCullough/Marzano Research/MZR - Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/reliabilityround2.csv")
+write.csv(x = items,file = "C:/Users/DavidMcCullough/Marzano Research/MZR - Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/reliabilityround3.csv")
