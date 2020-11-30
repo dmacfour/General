@@ -1,0 +1,36 @@
+---
+title: "Untitled"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(readxl)
+df <- read_excel("C:/Users/DavidMcCullough/Marzano Research/MZR - Share/10_REL/Task 3-Collaboration/3.1 Partnerships/SFS Partnership/2020/Raw Alchemer data/Complied Alchemer reports.xlsx")
+
+vars <- names(df)
+```
+
+```{r}
+results <- list()
+for (i in 20:29) {
+  variable <- i
+temp <- df %>% 
+  filter(!is.na(get(vars[variable]))) %>% 
+  group_by(get(vars[variable])) %>% 
+  tally()
+
+
+print(vars[variable])
+
+print(knitr::kable(temp))
+}
+
+
+```
