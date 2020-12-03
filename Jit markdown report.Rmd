@@ -1,58 +1,189 @@
 ---
 title: "JiT Summary"
 output:
+  word_document: default
   html_document:
     df_print: paged
-  word_document: default
 ---
-The following chunk of code reads in and merges the sheets from the workbook, then removes rows where the "Date Coded" field was left blank:
 
-```{r processing}
+```{r processing, include=FALSE, warning=FALSE,message=FALSE}
 library(readxl)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-state <- c("Kansas","Nebraska","Wyoming ", "North Dakota")
+library(ggpubr)
+theme_set(theme_pubr())
 
-df <- data.frame()
-
-for (states in state){
-  
-  df <- rbind(df,read_excel("C:/Users/DavidMcCullough/Marzano Research/MZR - Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/CE6.6.1 Data Entry_FINAL.xlsx", 
-             sheet = states)[,1:26])
-}
-
-df_coded <- df[!is.na(df$`Date Coded`),]
+df <- read_excel("C:/Users/DavidMcCullough/Marzano Research/MZR - Share/10_REL/Task 6-Research/CE6.6_JiT/Data Entry/Analysis/Output/Kansas_data.xlsx")
 
 vars <- names(df)
 
 ```
 
-The following code chunk generates barplots for each of the TBD variables in the datasets. 
 
-```{r, echo= FALSE}
-results <- list()
-
+```{r Internet Access, echo=FALSE}
 variable <- 5
+```
+
+```{r code for plots, include=FALSE}
+#Overview
 temp <- df %>% 
   filter(!is.na(get(vars[variable]))) %>% 
-  group_by(State, get(vars[variable])) %>% 
+  group_by(get(vars[variable])) %>% 
+  tally() %>% 
+  mutate(percent = round((n/sum(n))*100,digits = 1))
+
+names(temp)[1] <- vars[variable]
+temp <- temp[temp[1] != 'NA',]
+
+p1 <- ggplot(data = temp, aes(x=factor(get(vars[variable])),y=percent,fill=factor(get(vars[variable])))) + 
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
+  theme(axis.text.x = element_blank(),
+        plot.caption = element_text(hjust = 0, 
+                                    face= "italic"),
+        plot.title = element_text(hjust = 0.5)) +
+  labs(fill="Response:", 
+       y="Percent", 
+       x="", 
+       caption="Figure 1: Percentage of school districts in Kansas indicating internet access options") + 
+  ggtitle(tools::toTitleCase(vars[variable])) + 
+  fill_palette("nejm")
+
+t1 <- knitr::kable(spread(data = temp[,-2],key = get(vars[variable]),value = percent))
+
+#Urban-rural
+temp <- df %>% 
+  filter(!is.na(get(vars[variable]))) %>% 
+  group_by(`Urban-Centric Locale`, get(vars[variable])) %>% 
   tally() %>% 
   mutate(percent = round((n/sum(n))*100,digits = 1))
 
 names(temp)[2] <- vars[variable]
+temp <- temp[temp[2] != 'NA',]
+
+p2 <- ggplot(data = temp, aes(x=factor(get(vars[variable])),y=percent,fill=factor(get(vars[variable])))) + 
+  geom_bar(stat = "identity", position = position_dodge(0.9)) + 
+  facet_grid(cols = vars(`Urban-Centric Locale`)) + 
+  theme(axis.text.x = element_blank(),
+        plot.caption = element_text(hjust = 0, 
+                                    face= "italic"),
+        plot.title = element_text(hjust = 0.5)) +
+  labs(fill="Response:", 
+       y="Percent", 
+       x="", 
+       caption="Figure 1: Percentage of school districts in Kansas indicating internet access options, by NCES locale designation") + 
+  fill_palette("nejm")
+
+p2a <- ggplot(data = temp, aes(x=`Urban-Centric Locale`,y=percent,fill=factor(get(vars[variable])))) + 
+  geom_bar(position="fill", stat="identity") +
+  theme(plot.caption = element_text(hjust = 0, 
+                                    face= "italic"),
+        plot.title = element_text(hjust = 0.5)) +
+  labs(fill="Response:", 
+       y="Percent", 
+       x="", 
+       caption="Figure 1: Percentage of school districts in Kansas indicating internet access options by \nNCES locale designation") + 
+  fill_palette("nejm")+ 
+  coord_flip() + guides(fill = guide_legend(reverse=TRUE))
+
+t2 <- knitr::kable(spread(data = temp[,-3],key = get(vars[variable]),value = percent))
+
+#Internet Connectivity
+temp <- df %>% 
+  filter(!is.na(get(vars[variable]))) %>% 
+  group_by(`Internet Connectivity`, get(vars[variable])) %>% 
+  tally() %>% 
+  mutate(percent = round((n/sum(n))*100,digits = 1))
+
+names(temp)[2] <- vars[variable]
+temp <- temp[temp[2] != 'NA',]
+
+p3 <- ggplot(data = temp, aes(x=factor(get(vars[variable])),y=percent,fill=factor(get(vars[variable])))) + 
+  geom_bar(stat = "identity", position = position_dodge(0.9)) + 
+  facet_grid(cols = vars(`Internet Connectivity`)) + 
+  theme(axis.text.x = element_blank(),
+        plot.caption = element_text(hjust = 0, 
+                                    face= "italic"),
+        plot.title = element_text(hjust = 0.5)) +
+  labs(fill="Response:", 
+       y="Percent", 
+       x="", 
+       caption="Figure 1: Percentage of school districts in Kansas indicating internet access options, by NCES locale designation") + 
+  fill_palette("nejm")
+
+p3a <- ggplot(data = temp, aes(x=`Internet Connectivity`,y=percent,fill=factor(get(vars[variable])))) + 
+  geom_bar(position="fill", stat="identity") +
+  theme(plot.caption = element_text(hjust = 0, 
+                                    face= "italic"),
+        plot.title = element_text(hjust = 0.5)) +
+  labs(fill="Response:", 
+       y="Percent", 
+       x="", 
+       caption="Figure 1: Percentage of school districts in Kansas indicating internet access options by \nNCES locale designation") + 
+  fill_palette("nejm")+ 
+  coord_flip() + guides(fill = guide_legend(reverse=TRUE))
+
+t3 <- knitr::kable(spread(data = temp[,-3],key = get(vars[variable]),value = percent))
+
 ```
 
-```{r, fig.width = 9, fig.height = 4, out.width='100%', fig.align= "center"}
-ggplot(data = temp, aes(x=factor(get(vars[variable])),y=percent,fill=factor(get(vars[variable])))) + 
-  geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) + 
-  facet_grid(cols = vars(State)) + 
-  theme(axis.text.x = element_blank(),axis.title = element_blank(),plot.title = element_text(hjust = 0.5)) +
-  labs(fill="Response") + 
-  ggtitle(tools::toTitleCase(vars[variable]))
+
+## `r vars[variable]`
+
+`r vars[variable]` responses were coded as `r paste(unique(df[[variable]])[1:length(unique(df[[variable]])) - 1], sep=",", collapse = ", ")` and `r paste(unique(df[[variable]])[length(unique(df[[variable]]))], sep=",", collapse = ", ")`.
+
+### Overview
+
+The distribution of `r vars[variable]` for school districts was calculated by summing the number of districts that were coded in each response category, then dividing each category by the total number of responses. These were then multiplied by 100 to yield a percentage. 
+
+#### Figure: Barchart of the Percentage of `r vars[variable]` responses:
+
+```{r, fig.width = 9, fig.height = 4, out.width='100%', fig.align= "center", echo=FALSE, warning=FALSE,message=FALSE}
+#Faceted bar chart
+p1
+#Stacked percentages
 ```
 
-```{r}
-knitr::kable(spread(data = temp[,-4],key = get(vars[variable]),value = n))
-knitr::kable(spread(data = temp[,-3],key = get(vars[variable]),value = percent))
+
+#### Distribution of `r vars[variable]` (percentage):
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+t1
+```
+
+### Urban-Rural Locale
+
+The distribution of `r vars[variable]` responses by school districts was calculated for each NCES Urban-rural locale classification. Within a particular urban-rural classificiation, the percentage indicating each `r vars[variable]` response was calculated by dividing the number of districts that indicated that `r vars[variable]` response by the total number of districts within that urbal-rural classification.
+
+#### Figure: Barchart of the Percentage of `r vars[variable]` responses by NCES Locale classification
+
+```{r, fig.width = 9, fig.height = 4, out.width='100%', fig.align= "center", echo=FALSE, warning=FALSE,message=FALSE}
+#Faceted bar chart
+p2
+#Stacked percentages
+```
+
+#### Distribution of `r vars[variable]` responses by NCES Locale classification (percentage):
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+t2
+```
+
+### Internet Connectivity
+
+The distribution of `r vars[variable]` responses by school districts was calculated for each NCES Internet Connectivity classification. Within a particular Internet Connectivity classificiation, the percentage indicating each `r vars[variable]` response was calculated by dividing the number of districts that indicated that `r vars[variable]` response by the total number of districts within that Internet Connectivity classification.
+
+#### Figure: Barchart of the Percentage of `r vars[variable]` by NCES Internet Connectivity
+
+```{r, fig.width = 9, fig.height = 4, out.width='100%', fig.align= "center", echo=FALSE, warning=FALSE,message=FALSE}
+#Faceted bar chart
+p3
+
+#Stacked percentages
+```
+
+#### Distribution of `r vars[variable]` responses by NCES Internet Connectivity (percentage):
+
+```{r, echo=FALSE, warning=FALSE,message=FALSE}
+t3
 ```
